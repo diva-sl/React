@@ -15,7 +15,8 @@ class App extends React.Component {
             userInput: 0,
             gridSize: 3,
             frameSize: 2,
-            result: ''
+            result: '',
+            resultValue:''
 
         }
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -41,11 +42,14 @@ class App extends React.Component {
             frameSize: newValue
         })
     }
- onFindResult = (newValue) => {
+    
+    onFindResult = (newValue) => {
+        const sum = newValue.reduce((a,c)=>a+c);
         this.setState({
-            frameSize: newValue
+            result: newValue,
+            resultValue: sum
         })
-    }
+    }   
 
 
     render() {
@@ -78,7 +82,8 @@ class App extends React.Component {
         <br />
         <div>
         <FrameAndCalc values={values} size={this.state.gridSize} 
-        frameSize={this.state.frameSize} result ={this.state.result} 
+        frameSize={this.state.frameSize} result ={this.state.result}
+        resultValue={this.state.resultValue} 
         onChange={this.changeFrame} onResult = {this.onFindResult} />
         </div>
       </div>
@@ -112,6 +117,54 @@ function Grid({grid,size}) {
     )
 }
 
+
+
+function FrameAndCalc(props) {
+    
+    function onClick(){
+           let output = findResult(props.values,props.size,props.frameSize);
+            props.onResult(output); 
+
+    }
+
+    function frameChange(e) {
+        
+        props.onChange(e.target.value);
+
+    }
+
+    return (
+            <div>
+            <label>Select Frame Size:</label>
+            <br />
+            <input type="number" min="1"
+            onChange={frameChange} /> 
+            <br />
+            <br />
+            <button onClick={onClick}> Find </button>
+            <br />
+            <br />
+            <div>
+            <div> Best Frame : {props.result.toString()}
+            </div>
+            <br />   
+            <div> 
+            FrameValue : {props.resultValue}
+            </div>
+            </div>
+            </div>
+        )
+
+}
+
+
+
+
+
+export default App;
+
+
+
 // const findResult = (inputArray,gridSize,frameSize) => {
 //     let bestFrame;
 //     let prevSumOfFrame=0;
@@ -126,48 +179,6 @@ function Grid({grid,size}) {
 //     });
 //     return bestFrame;
 // }
-
-
-
-function FrameAndCalc(props) {
-    
-    function onClick(){
-           let output = findResult(props.values,props.size,props.frameSize);
-            props.onResult(output);
-           console.log(output) 
-
-    }
-
-    function frameChange(e) {
-        
-        props.onChange(e.target.value);
-
-    }
-    console.log(props.result);
-
-    return (
-            <div>
-            <label>Select Frame Size:</label>
-            <br />
-            <input type="number" min="1"
-            onChange={frameChange} /> 
-            <br />
-            <br />
-            <button onClick={onClick}> Find </button>
-            <br />
-            <p></p>
-            </div>
-        )
-
-}
-
-
-
-
-
-export default App;
-
-
 
 
 
