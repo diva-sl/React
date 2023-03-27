@@ -2,16 +2,15 @@ import './App.css';
 import React from "react";
 import findResult from './project11'
 
-
 const range = (a, b) => Array(b - a).fill().map((e, i) => i + a);
-
 const values =[];
-
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            fileName: '',
+            fileContent: '',
             userInput: 0,
             gridSize: 3,
             frameSize: 2,
@@ -51,15 +50,31 @@ class App extends React.Component {
         })
     }   
 
+   handleFileChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload =() => {
+            this.setState({
+                fileName:file.name,
+                fileContent:reader.result
+            })
+         reader.onerror = () => {
+            console.log('file error',reader.error);
+         }
+        }
+   }
 
     render() {
-                
          const grid = range(0,this.state.gridSize*this.state.gridSize); 
-         
         return ( 
           <div className = "App">
             <h1> Data Traversal </h1> <div>
-            use file:
+            <div>
+            <input type="file" onChange={this.handleFileChange} 
+             />
+            </div>
+            <br />
             <label> Select Grid: </label> 
             <input type = "number" min="0"
             onChange = {
@@ -94,13 +109,9 @@ class App extends React.Component {
 
 
 function Grid({grid,size}) {
-
-
-
     const assignCellValue = (index, e)=> {
         values[index] = Number(e.target.value);
     };
-
 
     return (
         <div className="container" 
@@ -132,7 +143,6 @@ function FrameAndCalc(props) {
         props.onChange(e.target.value);
 
     }
-
     return (
             <div>
             <label>Select Frame Size:</label>
@@ -214,4 +224,3 @@ export default App;
 //     .fill()
 //     .map(() => Array(columns).fill().map(mapper))
 // }
-
