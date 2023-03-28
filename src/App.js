@@ -12,25 +12,33 @@ class App extends React.Component {
             fileName: '',
             fileContent: '',
             userInput: 0,
-            gridSize: 3,
+            grid:[],
+            gridSize: 0,
             frameSize: 2,
             result: '',
             resultValue:''
 
         }
+
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+
     }
-    handleSubmit() {
+
+
+handleSubmit() {
         if(this.state.userInput > 0){
         this.setState({
-            gridSize: Number(this.state.userInput)
+            gridSize: Number(this.state.userInput),
+            grid: range(0,this.state.userInput*this.state.userInput).map(emptyIndex => emptyIndex = "")             
+
         });
         }else{
             alert("Please Enter above 2")
         }
-    }
-    handleChange(e) {
+
+}
+ handleChange(e) {
         this.setState({
             userInput: e.target.value
         });
@@ -43,7 +51,8 @@ class App extends React.Component {
     }
     
     onFindResult = (newValue) => {
-        const sum = newValue.reduce((a,c)=>a+c);
+        console.log(newValue);
+        const sum = newValue.reduce((a,c)=>Number(a)+Number(c));
         this.setState({
             result: newValue,
             resultValue: sum
@@ -53,21 +62,40 @@ class App extends React.Component {
    handleFileChange = (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
+        let fileInputs=""
         reader.readAsText(file);
         reader.onload =() => {
+            fileInputs = reader.result.split(/\s+/g);
             this.setState({
                 fileName:file.name,
-                fileContent:reader.result
+                fileContent: reader.result.split(/\s+/g),
+                gridSize:Math.sqrt(fileInputs.length)
             })
+
          reader.onerror = () => {
             console.log('file error',reader.error);
          }
         }
    }
 
+    updateGrid = (index,e) => {
+       
+       this.state.grid[index]=e.target.value
+      
+       this.setState({
+           grid: this.state.grid
+       })
+    }
+
     render() {
-         const grid = range(0,this.state.gridSize*this.state.gridSize); 
+
+        if(this.state.fileContent !== ""){
+           this.state.grid=this.state.fileContent;
+        }
+
+
         return ( 
+    
           <div className = "App">
             <h1> Data Traversal </h1> <div>
             <div>
@@ -92,11 +120,12 @@ class App extends React.Component {
             <br />
              <br />
         <div>
-        <Grid grid={grid} size={this.state.gridSize} />
+        <Grid grid={this.state.grid} size={this.state.gridSize} OnGridUpdate={this.updateGrid}
+        file={this.state.fileContent} />
         </div>
         <br />
         <div>
-        <FrameAndCalc values={values} size={this.state.gridSize} 
+        <FrameAndCalc values={this.state.grid} size={this.state.gridSize} 
         frameSize={this.state.frameSize} result ={this.state.result}
         resultValue={this.state.resultValue} 
         onChange={this.changeFrame} onResult = {this.onFindResult} />
@@ -108,8 +137,10 @@ class App extends React.Component {
 
 
 
-function Grid({grid,size}) {
+function Grid({grid,size,file,OnGridUpdate}) {
+
     const assignCellValue = (index, e)=> {
+        OnGridUpdate(index,e);
         values[index] = Number(e.target.value);
     };
 
@@ -120,7 +151,9 @@ function Grid({grid,size}) {
         {grid.map((index, i) => {
             return (
                 <div className="item" key={i}>
-                    <input id={index} type="text" onChange={(e)=> assignCellValue(index, e)} className="gridVal"/>
+                    <input id={i} type="text" value={index} 
+                    onChange={(e)=> assignCellValue(i, e)} className="gridVal"/>
+                
                 </div>
             );
         })}
